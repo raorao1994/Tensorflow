@@ -1,0 +1,1 @@
+windows中jupyter（原ipython notebook）中文件工作路径的设置:http://blog.sina.com.cn/s/blog_591e424b0102wecu.html
