@@ -1,0 +1,4 @@
+1、Tab自动补全
+2、ctrl+enter运行
+3、shift+Tab方法提示
+4、ctrl+？注释
