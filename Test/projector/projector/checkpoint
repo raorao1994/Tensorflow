@@ -1,0 +1,2 @@
+model_checkpoint_path: "F:/SVN/Tensorflow/trunk/Test/projector/projector/a_model.ckpt-1001"
+all_model_checkpoint_paths: "F:/SVN/Tensorflow/trunk/Test/projector/projector/a_model.ckpt-1001"

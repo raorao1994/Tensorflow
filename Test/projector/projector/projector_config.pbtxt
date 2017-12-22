@@ -1,0 +1,9 @@
+embeddings {
+  tensor_name: "embedding:0"
+  metadata_path: "F:/SVN/Tensorflow/trunk/Test/projector/projector/metadata.tsv"
+  sprite {
+    image_path: "F:/SVN/Tensorflow/trunk/Test/projector/data/mnist_10k_sprite.png"
+    single_image_dim: 28
+    single_image_dim: 28
+  }
+}
