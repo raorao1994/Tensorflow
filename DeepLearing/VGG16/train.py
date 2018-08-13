@@ -115,6 +115,7 @@ def readBatch(filename,batchsize):
     label_batch=0
     return image_batch,label_batch;
 
+#运行程序
 if __name__=="__main__":
     train_filename="train.tfrecords"
     test_filename="test.tfrecords"
