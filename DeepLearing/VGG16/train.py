@@ -19,10 +19,13 @@ def conv_op(input_op,name,kh,kw,n_out,dh,dw):
     input_op=tf.convert_to_tensor(input_op)
     n_in=input_op.get_shape()[-1].value;
     with tf.name_scope(name) as scope:
-        kernel=tf.get_variable(scope+"w",
-                               shape=[kh,kw,n_in,n_out],
-                               dtype=tf.float32,
-                               initializer=tf.contrib.layers.xavier_initailizer_conv2d())
+        # kernel=tf.get_variable(scope+"w",
+        #                        shape=[kh,kw,n_in,n_out],
+        #                        dtype=tf.float32,
+        #                        initializer=tf.contrib.layers.xavier_initializer_conv2d())
+        kernel = tf.get_variable(scope + "w",
+                                 shape=[kh, kw, n_in, n_out],
+                                 dtype=tf.float32)
         conv=tf.nn.conv2d(input_op,kernel,(1,dh,dw,1),padding='SAME')
         bias_init_val=tf.constant(0.0,shape=[n_out],dtype=tf.float32)
         biases=tf.Variable(bias_init_val,trainable=True,name='b')
@@ -34,14 +37,13 @@ def conv_op(input_op,name,kh,kw,n_out,dh,dw):
 def fc_op(input_op,name,n_out):
     n_in=input_op.get_shape()[-1].value
     with tf.name_scope(name) as scope:
-        kernel=tf.get_variable(scope+'w',
-                               shape=[n_in,n_out],
-                               dtype=tf.float32,
-                               initializer=tf.contrib.layers.xavier_initailizer())
-        biase_init_val=tf.constant(0.1,shape=[n_out],dtype=tf.float32)
-        biases=tf.Variable(biase_init_val,name='b')
-        activation=tf.nn.relu(input_op,kernel,biases,name=scope)
-        return activation;
+        weight = tf.Variable(tf.truncated_normal([n_in, n_out], mean=0.0, stddev=1.0, dtype=tf.float32, name="Weight"))
+        fc_bias = tf.Variable(tf.constant(0.0, dtype=tf.float32, shape=[n_out], name="bias"))
+        fc = tf.matmul(input_op, weight)
+        fc = tf.nn.bias_add(fc, fc_bias)
+        fc = tf.nn.relu(fc,name=scope)
+        return fc;
+
 
 #定义池化层
 def maxpool_op(input_op,name,kh,kw,dh,dw):
@@ -112,24 +114,27 @@ def train(logits,labels):
 
 #运行程序
 if __name__=="__main__":
-    train_filename="train.tfrecords"
-    test_filename="test.tfrecords"
-    image_batch,label=TFRecord.readBatch(filename=train_filename,batchsize=2)
-    test_image,test_label=TFRecord.readBatch(filename=test_filename,batchsize=20)
-
+    train_filename="E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/train.tfrecords"
+    test_filename="E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/test.tfrecords"
+    print("读取训练数据")
+    image_batch,label=TFRecord.createBatch(filename=train_filename,batchsize=2)
+    test_image,test_label=TFRecord.createBatch(filename=test_filename,batchsize=20)
+    print("创建网络结构")
     pred=inference_op(input_op=image_batch,keep_prob=keep_prob)
     test_pred=inference_op(input_op=test_image,keep_prob=keep_prob)
+    print("开始训练")
+
     optimizer,cost,accuracy=train(logits=pred,labels=label)
     test_optimizer, test_cost, test_accuracy = train(logits=test_pred, labels=test_label)
     initop=tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
-    with tf.Session as sess:
+    with tf.Session() as sess:
         sess.run(initop)
         coord=tf.train.Coordinator()
         threads=tf.train.start_queue_runners(sess=sess,coord=coord)
         step=0
         while step<epochs:
             step+=1
-            print(step)
+            print("step="+str(step))
 
             _,loss,acc=sess.run([optimizer,cost,accuracy])
             if step%display_step ==0:

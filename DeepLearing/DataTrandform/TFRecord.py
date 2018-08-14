@@ -4,9 +4,9 @@ import os.path
 from PIL import Image
 
 #数据路径
-data_Dir='/home/wc/DataSet/traffic/testTFRecord/'
+data_Dir='E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/test/'
 #数据类别
-classesList={'xiansu60', 'xiansu100'}
+classesList={'lily', 'sunflower'}
 
 # 生成整数型的属性
 def _int64_feature(value):
@@ -30,6 +30,7 @@ def createTFRecord(TFRecordFileName, LabelFileName):
     for index, name in enumerate(classes):
         class_path = data_dir + name + '/'
         class_map[index] = name
+        print(name+"开始处理")
         for img_name in os.listdir(class_path):
             img_path = class_path + img_name  # 每个图片的地址
             img = Image.open(img_path)
@@ -87,10 +88,10 @@ def createBatch(filename, batchsize):
     return image_batch, label_batch
 
 
-if __name__ == "__main__":
+def demo():
     # 训练图片两张为一个batch,进行训练，测试图片一起进行测试
-    mapfile = "/home/wc/DataSet/traffic/testTFRecord/classmap.txt"
-    train_filename = "/home/wc/DataSet/traffic/testTFRecord/train.tfrecords"
+    mapfile = "E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/classmap.txt"
+    train_filename = "E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/train.tfrecords"
     #     createTFRecord(train_filename,mapfile)
     test_filename = "/home/wc/DataSet/traffic/testTFRecord/test.tfrecords"
     #     createTFRecord(test_filename,mapfile)
@@ -117,10 +118,25 @@ if __name__ == "__main__":
             while 1:
                 _test_images, _test_labels = sess.run([test_images, test_labels])
                 step += 1
-                print("step="+str(step))
-                #print _image_batch.shape
+                print("step=" + str(step))
+                # print _image_batch.shape
                 print(_test_labels)
         except tf.errors.OutOfRangeError:
             print(" TEST done!")
         coord.request_stop()
         coord.join(threads)
+
+if __name__ == "__main__":
+    # 训练图片两张为一个batch,进行训练，测试图片一起进行测试
+    mapfile = "E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/classmap.txt"
+    #train_filename = "E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/train.tfrecords"
+    #createTFRecord(train_filename,mapfile)
+
+    test_filename = "E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/test.tfrecords"
+    createTFRecord(test_filename,mapfile)
+
+    #image_batch, label_batch = createBatch(filename=train_filename, batchsize=2)
+    #test_images, test_labels = createBatch(filename=test_filename, batchsize=20)
+
+    print("处理完成！！！")
+
