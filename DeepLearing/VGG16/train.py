@@ -16,7 +16,7 @@ class_num=2
 
 #定义卷积层
 def conv_op(input_op,name,kh,kw,n_out,dh,dw):
-    input_op=tf.convert_to_tensor(input_op)
+    input_op=tf.convert_to_tensor(input_op,name=name)
     n_in=input_op.get_shape()[-1].value;
     with tf.name_scope(name) as scope:
         # kernel=tf.get_variable(scope+"w",
@@ -105,7 +105,7 @@ def train(logits,labels):
 
     optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
-    correct_pred=tf.equal(tf.arg_max(logits,1),tf.arg_max(labels,1))
+    correct_pred=tf.equal(tf.arg_max(logits,1),tf.arg_max(labels,1),name="equal")
 
     accuracy=tf.reduce_mean(tf.cast(correct_pred,tf.float32))
 
@@ -114,8 +114,10 @@ def train(logits,labels):
 
 #运行程序
 if __name__=="__main__":
+    save_model="E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/Model/model.ckpt"
     train_filename="E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/train.tfrecords"
     test_filename="E:/Github/TensorFlow/trunk/DeepLearing/TrainMyData/data/TFRecord/test.tfrecords"
+
     print("读取训练数据")
     image_batch,label=TFRecord.createBatch(filename=train_filename,batchsize=2)
     test_image,test_label=TFRecord.createBatch(filename=test_filename,batchsize=20)
@@ -129,6 +131,7 @@ if __name__=="__main__":
     initop=tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
     with tf.Session() as sess:
         sess.run(initop)
+        saver = tf.train.Saver()
         coord=tf.train.Coordinator()
         threads=tf.train.start_queue_runners(sess=sess,coord=coord)
         step=0
@@ -139,9 +142,12 @@ if __name__=="__main__":
             _,loss,acc=sess.run([optimizer,cost,accuracy])
             if step%display_step ==0:
                 print(loss,acc)
+                saver.save(sess,save_model,global_step=step)
         print('train finish!')
 
         _, testLoss, testAcc = sess.run([test_optimizer, test_cost, test_accuracy])
         print("Test acc = " + str(testAcc))
         print("Test Finish!")
+
+    print("训练完成！！！")
 
