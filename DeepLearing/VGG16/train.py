@@ -3,7 +3,7 @@
 '''
 import tensorflow as tf
 import numpy as np
-import TFRecord
+import DeepLearing.DataTrandform.TFRecord as TFRecord
 
 #定义网络参数
 learning_rate=0.001
@@ -109,18 +109,13 @@ def train(logits,labels):
 
     return optimizer,cost,accuracy;
 
-#读取TFrecord
-def readBatch(filename,batchsize):
-    image_batch=0
-    label_batch=0
-    return image_batch,label_batch;
 
 #运行程序
 if __name__=="__main__":
     train_filename="train.tfrecords"
     test_filename="test.tfrecords"
-    image_batch,label=readBatch(filename=train_filename,batchsize=2)
-    test_image,test_label=readBatch(filename=test_filename,batchsize=20)
+    image_batch,label=TFRecord.readBatch(filename=train_filename,batchsize=2)
+    test_image,test_label=TFRecord.readBatch(filename=test_filename,batchsize=20)
 
     pred=inference_op(input_op=image_batch,keep_prob=keep_prob)
     test_pred=inference_op(input_op=test_image,keep_prob=keep_prob)
